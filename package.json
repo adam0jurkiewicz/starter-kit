@@ -4,7 +4,7 @@
   "description": "JavaScript development environment Pluralsight course by Cory House",
   "scripts": {
     "prestart": "babel-node buildScripts/startMessage.js",
-    "start": "npm-run-all --parallel security-check open:src",
+    "start": "npm-run-all --parallel security-check open:src lint-watch test-watch start-mockapi",
     "open:src": "babel-node buildScripts/srcServer.js",
     "security-check": "nsp check",
     "local-tunnel": "lt --port 3000",
@@ -12,11 +12,20 @@
     "lint-watch": "npm run lint -- --watch",
     "share": "npm-run-all --parallel open:src local-tunnel",
     "test": "mocha --reporter progress buildScripts/testSetup.js \"tests/**/*.js\"",
-    "test-watch": "npm run test -- --watch"
+    "test-watch": "npm run test -- --watch",
+    "generate-mock-data": "babel-node buildScripts/generateMockData",
+    "prestart-mockapi": "npm run generate-mock-data",
+    "start-mockapi": "json-server --watch src/api/db.json --port 3001",
+    "clean-dist": "rimraf ./dist && mkdir dist",
+    "prebuild": "npm-run-all clean-dist test lint",
+    "build": "babel-node buildScripts/build.js",
+    "postbuild": "babel-node buildScripts/distServer.js"
   },
   "author": "Adam Jurkiewicz",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "whatwg-fetch": "^2.0.3"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -33,7 +42,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-watch": "^3.1.3",
     "express": "^4.16.2",
-    "extract-text-webpack-plugin": "^*",
+    "extract-text-webpack-plugin": "^3.0.2",
     "html-webpack-plugin": "^2.30.1",
     "json-schema-faker": "^0.4.6",
     "json-server": "^0.12.1",
@@ -42,7 +51,6 @@
     "nock": "^9.1.0",
     "npm-run-all": "^4.1.2",
     "nsp": "^3.1.0",
-    "numeral": "^2.0.6",
     "open": "0.0.5",
     "phantomjs": "^2.1.7",
     "rimraf": "^2.6.2",
